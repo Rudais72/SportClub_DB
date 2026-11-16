@@ -1,0 +1,1 @@
+Šī ir sporta kluba vadības sistēma, kas sadalīta trīs failos: main.py izveido datubāzi, functions.py satur datu apstrādes un CRUD funkcijas visām 8 tabulām, bet app.py nodrošina ērtu Tkinter grafisko saskarni.
