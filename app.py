@@ -58,188 +58,152 @@ ACTIONS = {
     "Delete equipment": (f.delete_equipment, [("Equipment ID", int)], True),
 }
 
+# ---------------------------------------------------------
+# Theme: "Vintage Club Ledger" — printed registry book.
+# Cream paper, serif typography, ink-black header band,
+# hairline rules, flat bordered buttons that invert on hover.
+# ---------------------------------------------------------
+PAPER = "#f6f1e4"        # warm cream page background
+CARD = "#fdfaf1"         # slightly lighter card / table surface
+INK = "#221d15"          # warm near-black ink
+INK_SOFT = "#6b6252"     # faded ink for secondary text
+RULE = "#c9bfa8"         # hairline rule colour
+SELECT = "#1d4230"       # deep club green — single accent colour
+SELECT_HOVER = "#153427"
+DANGER = "#8c2f39"       # muted oxblood red — delete actions only
+
+SERIF = ("Georgia", 11)
+SERIF_SMALL = ("Georgia", 10)
+SERIF_CAPS = ("Georgia", 10, "bold")
+SERIF_TITLE = ("Georgia", 26, "bold")
+SERIF_HEADER = ("Georgia", 12, "bold")
+
 # Initialize main window
 root = tk.Tk()
-root.title("SPORT CLUB MANAGER")
+root.title("Sport Club Registry")
 root.geometry("1024x720")
 root.minsize(840, 560)
-
-# ---------------------------------------------------------
-# Theme & Color Palette Constants (Modern Grey + Colorful Accents)
-# ---------------------------------------------------------
-BG_COLOR = "#313338"       # Modern neutral grey (Background)
-SURFACE_COLOR = "#3b3f45"  # Lighter grey (Cards, tables, notebook)
-PRIMARY_COLOR = "#3b82f6"  # Vivid blue for primary actions
-PRIMARY_HOVER = "#60a5fa"  # Lighter blue for hover
-TEXT_COLOR = "#f4f4f5"     # Near-white for clear readability
-MUTED_TEXT = "#9ca3af"     # Medium grey for secondary text
-BORDER_COLOR = "#4b5058"   # Subtle border grey
-INPUT_BG = "#202225"       # Dark input field background
-
-# Colorful accent per action button: text -> (style key, base color, hover color)
-ACCENTS = {
-    "Add client":        ("blue",   "#3b82f6", "#2563eb"),
-    "Update client":     ("indigo", "#6366f1", "#4f46e5"),
-    "Delete client":     ("red",    "#ef4444", "#dc2626"),
-    "Add trainer":       ("green",  "#10b981", "#059669"),
-    "Update trainer":    ("teal",   "#14b8a6", "#0d9488"),
-    "Delete trainer":    ("red",    "#ef4444", "#dc2626"),
-    "Add class":         ("purple", "#8b5cf6", "#7c3aed"),
-    "Update class":      ("violet", "#a78bfa", "#8b5cf6"),
-    "Delete class":      ("red",    "#ef4444", "#dc2626"),
-    "Add membership":    ("amber",  "#f59e0b", "#d97706"),
-    "Update membership": ("orange", "#f97316", "#ea580c"),
-    "Delete membership": ("red",    "#ef4444", "#dc2626"),
-    "Add schedule":      ("cyan",   "#06b6d4", "#0891b2"),
-    "Update schedule":   ("sky",    "#0ea5e9", "#0284c7"),
-    "Delete schedule":   ("red",    "#ef4444", "#dc2626"),
-    "Add booking":       ("lime",   "#84cc16", "#65a30d"),
-    "Update booking":    ("grass",  "#22c55e", "#16a34a"),
-    "Delete booking":    ("red",    "#ef4444", "#dc2626"),
-    "Add payment":       ("pink",   "#ec4899", "#db2777"),
-    "Update payment":    ("rose",   "#f43f5e", "#e11d48"),
-    "Delete payment":    ("red",    "#ef4444", "#dc2626"),
-    "Add equipment":     ("brown",  "#a16207", "#854d0e"),
-    "Update equipment":  ("stone",  "#78716c", "#57534e"),
-    "Delete equipment":  ("red",    "#ef4444", "#dc2626"),
-}
-
-root.configure(bg=BG_COLOR)
+root.configure(bg=PAPER)
 
 style = ttk.Style()
 style.theme_use('clam')
 
-style.configure(".", background=BG_COLOR, foreground=TEXT_COLOR, font=("Segoe UI", 10))
-style.configure("TFrame", background=BG_COLOR)
-style.configure("Header.TLabel", font=("Georgia", 26, "bold italic"), foreground=TEXT_COLOR, background=BG_COLOR,
-                anchor="center")
-style.configure("Subtitle.TLabel", font=("Segoe UI", 10), foreground=MUTED_TEXT, background=BG_COLOR,
-                anchor="center")
+# ---------------------------------------------------------
+# Ledger-style widget styling
+# ---------------------------------------------------------
+style.configure(".", background=PAPER, foreground=INK, font=SERIF_SMALL)
+style.configure("TFrame", background=PAPER)
+style.configure("Card.TFrame", background=CARD)
 
-# Standard Button Styling (neutral grey, modern flat look)
-style.configure("TButton",
-                background="#4b5058",
-                foreground=TEXT_COLOR,
+# Masthead: letterspaced title above a double rule
+style.configure("Masthead.TLabel", font=SERIF_TITLE, foreground=INK,
+                background=PAPER, anchor="w")
+style.configure("MastheadSub.TLabel", font=SERIF_CAPS, foreground=INK_SOFT,
+                background=PAPER, anchor="w")
+style.configure("Rule.TFrame", background=INK)
+
+# Buttons: flat, thin ink border, cream face — invert to ink on hover.
+# Delete actions are outlined in oxblood red instead.
+style.configure("Ledger.TButton",
+                background=CARD,
+                foreground=INK,
+                bordercolor=INK,
+                borderwidth=1,
+                relief="solid",
+                focusthickness=0,
+                padding=(12, 7),
+                font=SERIF_CAPS)
+style.map("Ledger.TButton",
+          background=[('active', INK), ('pressed', INK)],
+          foreground=[('active', CARD), ('pressed', CARD)])
+
+style.configure("Danger.Ledger.TButton",
+                bordercolor=DANGER,
+                foreground=DANGER)
+style.map("Danger.Ledger.TButton",
+          background=[('active', DANGER), ('pressed', DANGER)],
+          foreground=[('active', CARD), ('pressed', CARD)])
+
+# Modal submit button: solid deep green
+style.configure("Confirm.TButton",
+                background=SELECT,
+                foreground=CARD,
                 borderwidth=0,
                 focusthickness=0,
-                padding=(14, 9),
-                font=("Segoe UI", 9, "bold"))
-style.map("TButton",
-          background=[('active', '#5a606a'), ('pressed', '#202225')],
-          foreground=[('disabled', MUTED_TEXT)])
+                padding=(14, 8),
+                font=SERIF_CAPS)
+style.map("Confirm.TButton",
+          background=[('active', SELECT_HOVER), ('pressed', SELECT_HOVER)],
+          foreground=[('active', CARD)])
 
-# Colorful Accent Button Styling — one vivid color per action
-for _text, (_key, _base, _hover) in ACCENTS.items():
-    _style_name = f"Accent.{_key}.TButton"
-    style.configure(_style_name,
-                    background=_base,
-                    foreground="#ffffff",
-                    borderwidth=0,
-                    focusthickness=0,
-                    padding=(8, 8),
-                    font=("Segoe UI", 10, "bold"))
-    style.map(_style_name,
-              background=[('active', _hover), ('pressed', '#202225')],
-              foreground=[('active', '#ffffff'), ('pressed', '#ffffff'), ('disabled', '#ffffff')])
-
-# Primary Accent Button Styling (blue — used for modal Submit)
-style.configure("Primary.TButton",
-                background=PRIMARY_COLOR,
-                foreground="#ffffff",
-                borderwidth=0,
-                focusthickness=0,
-                padding=(14, 9),
-                font=("Segoe UI", 9, "bold"))
-style.map("Primary.TButton",
-          background=[('active', PRIMARY_HOVER), ('pressed', '#202225')],
-          foreground=[('active', '#ffffff')])
-
-# Notebook & Tabs Styling (modern flat tabs with blue selection)
-style.configure("TNotebook", background=BG_COLOR, borderwidth=0, tabmargins=(0, 0, 0, 8))
-style.configure("TNotebook.Tab",
-                background=SURFACE_COLOR,
-                foreground=MUTED_TEXT,
-                padding=[18, 10],
-                borderwidth=0,
-                font=("Segoe UI", 10, "bold"))
-style.map("TNotebook.Tab",
-          background=[('selected', PRIMARY_COLOR), ('active', '#4b5058')],
-          foreground=[('selected', '#ffffff'), ('active', TEXT_COLOR)])
-
-# Wrapping Table Styling (header + cells are labels, so long text can wrap)
-style.configure("Table.TFrame", background=SURFACE_COLOR)
-style.configure("TableHeading.TLabel",
-                background="#202225",
-                foreground=TEXT_COLOR,
-                borderwidth=0,
-                relief="flat",
-                font=("Segoe UI", 10, "bold"),
-                padding=(8, 8))
-style.configure("TableCell.TLabel",
-                background=SURFACE_COLOR,
-                foreground=TEXT_COLOR,
-                borderwidth=0,
-                relief="flat",
-                font=("Segoe UI", 10),
-                padding=(8, 6))
-
-# Scrollbar Styling (thin, blends with surface)
-style.configure("Vertical.TScrollbar",
-                background="#4b5058",
-                troughcolor=BG_COLOR,
-                borderwidth=0,
-                arrowsize=12)
-style.map("Vertical.TScrollbar", background=[('active', '#5a606a')])
-
-# Entry Field Styling (dark fields with subtle borders)
-style.configure("TEntry",
-                fieldbackground=INPUT_BG,
-                foreground=TEXT_COLOR,
+# Combobox table selector: ruled underline field with serif text
+root.option_add("*TCombobox*Listbox.background", CARD)
+root.option_add("*TCombobox*Listbox.foreground", INK)
+root.option_add("*TCombobox*Listbox.selectBackground", SELECT)
+root.option_add("*TCombobox*Listbox.selectForeground", CARD)
+style.configure("Ledger.TCombobox",
+                fieldbackground=CARD,
+                background=CARD,
+                foreground=INK,
+                bordercolor=INK,
+                lightcolor=INK,
+                darkcolor=INK,
                 borderwidth=1,
-                insertcolor=TEXT_COLOR,
-                padding=(6, 6))
-style.map("TEntry",
-          bordercolor=[('focus', PRIMARY_COLOR), ('!focus', BORDER_COLOR)])
+                arrowcolor=INK,
+                arrowsize=14,
+                padding=(10, 6),
+                font=SERIF_HEADER)
+style.map("Ledger.TCombobox",
+          bordercolor=[('focus', SELECT), ('!focus', INK)],
+          fieldbackground=[('readonly', CARD)],
+          foreground=[('readonly', INK)])
 
-# Combobox Styling (table selector dropdown)
-root.option_add("*TCombobox*Listbox.background", SURFACE_COLOR)
-root.option_add("*TCombobox*Listbox.foreground", TEXT_COLOR)
-root.option_add("*TCombobox*Listbox.selectBackground", PRIMARY_COLOR)
-root.option_add("*TCombobox*Listbox.selectForeground", "#ffffff")
-style.configure("TCombobox",
-                fieldbackground=INPUT_BG,
-                background="#4b5058",
-                foreground=TEXT_COLOR,
+# Entry fields: paper face with ink border
+style.configure("Ledger.TEntry",
+                fieldbackground=CARD,
+                foreground=INK,
+                bordercolor=INK,
+                lightcolor=RULE,
+                darkcolor=RULE,
                 borderwidth=1,
-                arrowcolor=TEXT_COLOR,
-                padding=(8, 6))
-style.map("TCombobox",
-          bordercolor=[('focus', PRIMARY_COLOR), ('!focus', BORDER_COLOR)],
-          fieldbackground=[('readonly', INPUT_BG)],
-          foreground=[('readonly', TEXT_COLOR)])
+                insertcolor=INK,
+                padding=(8, 6),
+                font=SERIF_SMALL)
+style.map("Ledger.TEntry", bordercolor=[('focus', SELECT), ('!focus', INK)])
+
+# Scrollbar: slim ink thumb on paper trough
+style.configure("Ledger.Vertical.TScrollbar",
+                background=PAPER,
+                troughcolor=PAPER,
+                bordercolor=PAPER,
+                arrowcolor=INK_SOFT,
+                borderwidth=0,
+                arrowsize=11)
+style.map("Ledger.Vertical.TScrollbar",
+          background=[('active', RULE), ('pressed', INK_SOFT)])
 
 # ---------------------------------------------------------
-# Wrapping Table Widget (columns share the whole width and
-# long text wraps onto several lines)
+# Wrapping Table Widget — printed ledger with an ink header
+# band, zebra rows and generous cell padding
 # ---------------------------------------------------------
 class WrapTable(ttk.Frame):
     PAD = 16      # horizontal padding inside each cell
     MIN_COL = 70  # a column can never be narrower than this
 
     def __init__(self, master):
-        super().__init__(master, style="Table.TFrame")
+        super().__init__(master, style="Card.TFrame")
         self.headers = []
         self.rows = []
 
-        scroll = ttk.Scrollbar(self, orient="vertical", style="Vertical.TScrollbar")
+        scroll = ttk.Scrollbar(self, orient="vertical", style="Ledger.Vertical.TScrollbar")
         scroll.pack(side="right", fill="y")
 
-        self.canvas = tk.Canvas(self, bg=SURFACE_COLOR, highlightthickness=0, bd=0)
+        self.canvas = tk.Canvas(self, bg=CARD, highlightthickness=0, bd=0)
         self.canvas.pack(side="left", fill="both", expand=True)
         self.canvas.configure(yscrollcommand=scroll.set)
         scroll.configure(command=self.canvas.yview)
 
-        self.inner = ttk.Frame(self.canvas, style="Table.TFrame")
+        self.inner = ttk.Frame(self.canvas, style="Card.TFrame")
         self._win = self.canvas.create_window((0, 0), window=self.inner, anchor="nw")
         self.inner.bind("<Configure>",
                         lambda event: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
@@ -252,7 +216,7 @@ class WrapTable(ttk.Frame):
         for child in self.inner.winfo_children():
             child.destroy()
         for c, h in enumerate(self.headers):
-            head = ttk.Label(self.inner, text=h, style="TableHeading.TLabel", anchor="w")
+            head = ttk.Label(self.inner, text=h.upper(), style="HeadCell.TLabel", anchor="w")
             head.grid(row=0, column=c, sticky="nsew")
         self._layout()
 
@@ -263,9 +227,11 @@ class WrapTable(ttk.Frame):
             if child.grid_info() and child.grid_info()["row"] > 0:
                 child.destroy()
         for r, row in enumerate(self.rows, start=1):
+            # zebra shading on even rows, like alternating ledger lines
+            style = "CellEven.TLabel" if r % 2 == 0 else "CellOdd.TLabel"
             for c in range(len(self.headers)):
                 text = str(row[c]) if c < len(row) else ""
-                cell = ttk.Label(self.inner, text=text, style="TableCell.TLabel", anchor="nw")
+                cell = ttk.Label(self.inner, text=text, style=style, anchor="nw")
                 cell.grid(row=r, column=c, sticky="nsew")
         self._layout()
 
@@ -303,79 +269,78 @@ class WrapTable(ttk.Frame):
         if steps:
             self.canvas.yview_scroll(steps, "units")
 
+
+# Ledger table cell styles: solid ink header band + zebra rows
+style.configure("HeadCell.TLabel",
+                background=INK,
+                foreground=CARD,
+                font=SERIF_CAPS,
+                padding=(8, 9))
+style.configure("CellOdd.TLabel",
+                background=CARD,
+                foreground=INK,
+                font=SERIF_SMALL,
+                padding=(8, 7))
+style.configure("CellEven.TLabel",
+                background="#f1ead8",
+                foreground=INK,
+                font=SERIF_SMALL,
+                padding=(8, 7))
+
 # ---------------------------------------------------------
 # Main UI Layout
 # ---------------------------------------------------------
-main_frame = ttk.Frame(root, padding=24)
+main_frame = ttk.Frame(root, padding=28)
 main_frame.pack(fill="both", expand=True)
 
-# App Title Header (centered logo + subtitle)
+# Masthead: title centred, table selector in the top-right corner,
+# double rule beneath — like a printed ledger page
 header_frame = ttk.Frame(main_frame)
-header_frame.pack(fill="x", pady=(0, 16))
-ttk.Label(header_frame, text="S P O R T   C L U B   M A N A G E R",
-          style="Header.TLabel").pack(fill="x")
-ttk.Label(header_frame, text="SQL Database on SQLite  ·  Sport Club Management System",
-          style="Subtitle.TLabel").pack(fill="x", pady=(4, 0))
-
-# ---------------------------------------------------------
-# Action Toolbar (created & packed BEFORE the table view so it
-# always keeps its space when the window is resized —
-# the table shrinks instead of hiding the buttons)
-# ---------------------------------------------------------
-bar = ttk.Frame(main_frame)
-bar.pack(side="bottom", fill="x", pady=(12, 0))
-
-action_buttons = []
-for text, (func, fields, count) in ACTIONS.items():
-    style_key, _, _ = ACCENTS[text]
-    btn = ttk.Button(bar, text=text, style=f"Accent.{style_key}.TButton",
-                     command=lambda t=text, a=(func, fields, count): open_form(t, *a))
-    action_buttons.append(btn)
-
-BTN_GAP = 4  # matches padx between buttons
-
-
-def relayout_buttons(event=None):
-    """Flows the action buttons onto multiple rows when the window is too narrow."""
-    width = bar.winfo_width()
-    if width < 50:
-        return
-    rows, current, x = [], [], 0
-    for btn in action_buttons:
-        w = btn.winfo_reqwidth()
-        need = w if not current else w + BTN_GAP
-        if current and x + need > width:
-            rows.append(current)
-            current, x = [btn], w
-        else:
-            current.append(btn)
-            x += need
-    if current:
-        rows.append(current)
-    for r, row in enumerate(rows):
-        for c, btn in enumerate(row):
-            btn.grid(row=r, column=c, padx=(0, BTN_GAP), pady=4, sticky="ew")
-    for col in range(max(len(r) for r in rows)):
-        bar.columnconfigure(col, weight=1)
-
-
-bar.bind("<Configure>", relayout_buttons)
-
-# ---------------------------------------------------------
-# Table Selector (single dropdown) & Table View
-# ---------------------------------------------------------
-table_bar = ttk.Frame(main_frame)
-table_bar.pack(fill="x", pady=(0, 12))
+header_frame.pack(fill="x", pady=(0, 18))
+header_frame.columnconfigure(0, weight=1)
+header_frame.columnconfigure(2, weight=1)
 
 table_var = tk.StringVar(value=list(TABLES.keys())[0])
-table_selector = ttk.Combobox(table_bar, textvariable=table_var,
+table_selector = ttk.Combobox(header_frame, textvariable=table_var,
                               values=list(TABLES.keys()),
-                              state="readonly", width=26,
-                              font=("Segoe UI", 11, "bold"))
-table_selector.pack(side="left", ipady=2)
+                              state="readonly", width=24,
+                              style="Ledger.TCombobox")
+table_selector.grid(row=0, column=2, sticky="e")
 
+ttk.Label(header_frame, text="S P O R T   C L U B   R E G I S T R Y",
+          style="Masthead.TLabel").grid(row=0, column=0, sticky="w")
+ttk.Label(header_frame, text="EST. TODAY  ·  A PRINTED-STYLE REGISTRY OF MEMBERS, CLASSES & PAYMENTS",
+          style="MastheadSub.TLabel").grid(row=1, column=0, sticky="w", pady=(6, 10))
+ttk.Frame(header_frame, style="Rule.TFrame", height=3).grid(row=2, column=0, columnspan=3, sticky="ew")
+ttk.Frame(header_frame, style="Rule.TFrame", height=1).grid(row=3, column=0, columnspan=3, sticky="ew", pady=(2, 0))
+
+# ---------------------------------------------------------
+# Left sidebar: action buttons in a fixed two-column grid
+# (packed BEFORE the table view so the table shrinks instead
+# of the sidebar when the window is resized)
+# ---------------------------------------------------------
+sidebar = ttk.Frame(main_frame)
+sidebar.pack(side="left", fill="y", padx=(0, 18))
+
+ttk.Label(sidebar, text="ACTIONS", font=SERIF_CAPS,
+          foreground=INK_SOFT, background=PAPER).grid(
+    row=0, column=0, columnspan=2, sticky="w", pady=(0, 8))
+
+for i, (text, (func, fields, count)) in enumerate(ACTIONS.items()):
+    danger = text.startswith("Delete")
+    btn = ttk.Button(sidebar, text=text.upper(),
+                     style="Danger.Ledger.TButton" if danger else "Ledger.TButton",
+                     command=lambda t=text, a=(func, fields, count): open_form(t, *a))
+    btn.grid(row=1 + i // 2, column=i % 2, padx=(0, 6), pady=3, sticky="ew")
+
+sidebar.columnconfigure(0, weight=1)
+sidebar.columnconfigure(1, weight=1)
+
+# ---------------------------------------------------------
+# Table View (middle of the window, beside the sidebar)
+# ---------------------------------------------------------
 table_container = ttk.Frame(main_frame)
-table_container.pack(fill="both", expand=True, pady=(0, 16))
+table_container.pack(side="left", fill="both", expand=True)
 
 table = WrapTable(table_container)
 table.pack(fill="both", expand=True)
@@ -405,24 +370,27 @@ def open_form(title, func, fields, returns_count):
     """Opens a clean, centered modal dialog window for user actions/inputs."""
     win = tk.Toplevel(root)
     win.title(title)
-    win.geometry("440x480")
+    win.geometry("460x520")
     win.resizable(False, False)
     win.transient(root)
     win.grab_set()
-    win.configure(bg=BG_COLOR)
+    win.configure(bg=PAPER)
 
-    form_frame = ttk.Frame(win, padding=24)
+    form_frame = ttk.Frame(win, padding=28)
     form_frame.pack(fill="both", expand=True)
 
-    ttk.Label(form_frame, text=title, font=("Segoe UI", 14, "bold")).grid(row=0, column=0, columnspan=2, sticky="w",
-                                                                          pady=(0, 16))
+    # Modal header: title with a single rule beneath
+    ttk.Label(form_frame, text=title, font=SERIF_HEADER,
+              background=PAPER, foreground=INK).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 4))
+    ttk.Frame(form_frame, style="Rule.TFrame", height=1).grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 14))
 
     converters = {int: int, float: float, str: str}
     entries = []
-    for i, (question, kind) in enumerate(fields, start=1):
-        ttk.Label(form_frame, text=question).grid(row=i, column=0, sticky="w", pady=6)
-        entry = ttk.Entry(form_frame, width=28)
-        entry.grid(row=i, column=1, sticky="ew", pady=6, padx=(12, 0))
+    for i, (question, kind) in enumerate(fields, start=2):
+        ttk.Label(form_frame, text=question, font=SERIF_SMALL,
+                  background=PAPER, foreground=INK_SOFT).grid(row=i, column=0, sticky="w", pady=7)
+        entry = ttk.Entry(form_frame, width=28, style="Ledger.TEntry")
+        entry.grid(row=i, column=1, sticky="ew", pady=7, padx=(12, 0))
         entries.append(entry)
 
     form_frame.columnconfigure(1, weight=1)
@@ -451,12 +419,12 @@ def open_form(title, func, fields, returns_count):
                                     "Done." if returns_count else f"Successfully completed. Result/ID: {result}",
                                     parent=root)
 
-    # Action Buttons Inside Modal
+    # Action buttons inside modal
     btn_frame = ttk.Frame(form_frame)
-    btn_frame.grid(row=len(fields) + 1, column=0, columnspan=2, sticky="e", pady=(24, 0))
+    btn_frame.grid(row=len(fields) + 2, column=0, columnspan=2, sticky="e", pady=(26, 0))
 
-    ttk.Button(btn_frame, text="Cancel", command=win.destroy).pack(side="right", padx=(8, 0))
-    ttk.Button(btn_frame, text="Submit", style="Primary.TButton", command=submit).pack(side="right")
+    ttk.Button(btn_frame, text="CANCEL", style="Ledger.TButton", command=win.destroy).pack(side="right", padx=(8, 0))
+    ttk.Button(btn_frame, text="SUBMIT", style="Confirm.TButton", command=submit).pack(side="right")
 
     win.bind("<Return>", submit)
     win.bind("<Escape>", lambda event: win.destroy())
