@@ -1,146 +1,62 @@
-# Sport Club Manager
-This is a program with a window where you can see and change the database of a sport club (clients, trainers, classes, memberships, schedule, bookings, payments, equipment).
+# Sporta kluba vadības sistēma
 
-## Files
+Projekts, kas izveidots, lai pārvaldītu sporta kluba ikdienas datus — klientus, trenerus, nodarbības, abonementus, nodarbību grafiku, rezervācijas, maksājumus un inventāru. Dati tiek glabāti SQLite datu bāzē, bet darbs ar tiem notiek, izmantojot grafisko saskarni (Tkinter) vai termināla izvēlni.
 
-- `main.py` - makes the database and adds some test data (run it one time)
-- `functions.py` - all functions for the database
-- `app.py` - the program with the window (run this one)
-- `terminal.py` - the same program but in the terminal (menu with numbers)
-- `sport_club.db` - the database (it appears after you run the first file)
+## Funkcionalitāte
 
-All files must be in the same folder.
+- Pilns CRUD (pievienot / apskatīt / rediģēt / dzēst) visām 8 tabulām
+- Grafiskā saskarnē tabulas var pārslēgt ar nolaižamo izvēlni, ierakstu formās var pārslēgties ar Enter, aizvērt ar Esc
+- Saistes starp tabulām ir aizsargātas ar foreign key ierobežojumiem
+- Termināla režīms ar izvēlni pa numuriem (piemērotāks ātrai pārbaudei bez loga)
 
-## What you need
+## Faili
 
-- Python 3.14
-- Tk 
+| Fails | Nozīme |
+|---|---|
+| `main.py` | Izveido datu bāzi, tabulas un testa ierakstus (palaist vienu reizi) |
+| `functions.py` | Visas datu bāzes funkcijas (SQL vaicājumi) |
+| `app.py` | Galvenā programma ar logu |
+| `terminal.py` | Tas pats, bet termināla izvēlnē |
+| `sport_club.db` | Datu bāzes fails (parādās pēc `main.py` palaišanas) |
 
-## How to install (Windows)
- 
-1. Go to https://www.python.org/downloads/ and download the Python installer for Windows.
-2. Open the installer. **Important:** at the first screen turn on the checkbox **"Add python.exe to PATH"**, then click Install Now. Tk is already inside.
-3. Open the project folder in File Explorer, click on the address bar, type `cmd` and press Enter. A black window (Command Prompt) opens in the right folder.
-4. Make a virtual environment and turn it on:
-```
+## Prasības
+
+- Python 3.10 vai jaunāka versija (pārbaudīts ar 3.14)
+- Tkinter (iekļauts standarta Python instalācijā; macOS ar Homebrew Python: `brew install python-tk@3.14`)
+
+## Palaišana
+
+Pirms pirmās palaišanas ieteicams izveidot virtuālo vidi:
+
+```bash
 python -m venv .venv
-.venv\Scripts\activate
-```
- 
- 
-If you use PowerShell and it says that running scripts is disabled, use Command Prompt (cmd) instead, or run this first:
- 
-```
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
- 
-### Check that Tk works:
-```
-python -m tkinter
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 ```
 
-## How to install (for Mac/Linux)
+Pēc tam:
 
-You need Python with Tk. There are two ways how to install it.
-
-### Way 1 - without Homebrew (easier)
-
-1. Go to https://www.python.org/downloads/ and download the Python installer for macOS.
-2. Open the file and click Continue until it is installed. Tk is already inside, you don't need anything more.
-3. Open Terminal, go to the project folder and make a virtual environment:
-
-```
-cd /your_map
-python3 -m venv .venv
-source .venv/bin/activate
+```bash
+python main.py    # izveido datu bāzi ar testa datiem (tikai vienu reizi)
+python app.py     # grafiskā versija
 ```
 
+## Lietošana
 
+Logā augšā izvēlies tabulu no saraksta, apakšā izvēlies darbību (Add / Update / Delete). Aizpildi laukus un nospied Submit. ID skaitļus paņem no attiecīgās tabulas pirmās kolonnas.
 
-### Way 2 - with Homebrew
+Datuma formāts: `YYYY-MM-DD` (piemēram, `2026-11-17`). Grafikam datums ar laiku: `YYYY-MM-DD HH:MM:SS`.
 
-If you don't have Homebrew, install it first from https://brew.sh. Or choose Way 1.
+## Datu bāzes tabulas
 
-Then:
+| Tabula | Saturs |
+|---|---|
+| `Klienti` | Kluba klienti un to kontakti |
+| `Treneri` | Treneri un specializācijas |
+| `Grupu_Nodarbibas` | Nodarbību veidi un ilgums |
+| `Abonementi` | Klientu abonementi (saiste uz Klienti) |
+| `Grafiks` | Kad un kur notiek nodarbības (saistes uz nodarbībām un treneriem) |
+| `Rezervacijas` | Klientu rezervācijas uz grafika ierakstiem |
+| `Maksajumi` | Klientu maksājumi |
+| `Inventars` | Kluba inventārs |
 
-```
-brew install python-tk@3.14
-cd /your_map
-/opt/homebrew/bin/python3.14 -m venv .venv
-source .venv/bin/activate
-```
-
-### Check that Tk works (both ways)
-
-```
-python -m tkinter
-```
-
-A small window should open. If it opens, everything is ok.
-
-## How to start
-
-First, make the database (only one time):
-
-```
-python main.py
-```
-
-Then start the program:
-
-```
-python app.py
-```
-
-Next time you only need these 3 lines:
-
-```
-cd /your_map
-source .venv/bin/activate
-python app.py
-```
-
-## How it works
-
-At the top there is one dropdown with all tables: Clients, Trainers, Group classes, Memberships, Schedule, Bookings, Payments, Equipment. Pick a table to see it. Columns share the whole width and long text wraps onto several lines.
-
-At the bottom there are buttons. Click a button, fill in the fields and press Submit. Press Cancel (or Esc) if you changed your mind. The tables update by themselves.
-
-## Buttons
-
-| Button | What to write |
-|--------|---------------|
-| Add client | first name, last name, phone, email, registration date |
-| Update client | client ID, first name, last name, phone, email, registration date |
-| Delete client | client ID |
-| Add trainer | first name, last name, phone, specialization, hire date |
-| Update trainer | trainer ID, first name, last name, phone, specialization, hire date |
-| Delete trainer | trainer ID |
-| Add class | name, description, duration in minutes |
-| Update class | class ID, name, description, duration in minutes |
-| Delete class | class ID |
-| Add membership | client ID, type, start date, end date |
-| Update membership | membership ID, client ID, type, start date, end date |
-| Delete membership | membership ID |
-| Add schedule | class ID, trainer ID, date & time, room |
-| Update schedule | schedule ID, class ID, trainer ID, date & time, room |
-| Delete schedule | schedule ID |
-| Add booking | client ID, schedule ID, booking date |
-| Update booking | booking ID, client ID, schedule ID, booking date |
-| Delete booking | booking ID |
-| Add payment | client ID, amount (for example 25.50), date, method |
-| Update payment | payment ID, client ID, amount, date, method |
-| Delete payment | payment ID |
-| Add equipment | name, quantity, condition, purchase date |
-| Update equipment | equipment ID, name, quantity, condition, purchase date |
-| Delete equipment | equipment ID |
-
-Dates must look like this: `2026-11-17`. Date & time must look like this: `2026-11-18 18:00:00`.
-
-IDs are in the first column of the tables, so look there first.
-
-Be careful with Delete client. It deletes the client and everything about him (memberships, bookings, payments...). You can't undo it.
-
-<h1 align="center">
-Thanks and GL!
-</h1>
+Dzēšot klientu, automātiski tiek dzēsti arī viņa abonementi, rezervācijas un maksājumi (`ON DELETE CASCADE`) — šo darbību nevar atsaukt.
